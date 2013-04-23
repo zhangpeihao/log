@@ -3,3 +3,5 @@ Log [![Build Status](https://secure.travis-ci.org/zhangpeihao/log.png)](http://t
 
 Log with levels and modules.
 
+Examples in test.
+
