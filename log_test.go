@@ -6,7 +6,7 @@ import (
 )
 
 func TestLog(t *testing.T) {
-	fmt.Println("================= TestLog ====================")
+	fmt.Println(`//////////////////// TestLog \\\\\\\\\\\\\\\\\\\\`)
 	counters := []string{"a", "b"}
 	logger := NewLogger(".", "test", counters, 2, 10, true)
 	// Default log level is Fatal
@@ -172,5 +172,17 @@ func TestLog(t *testing.T) {
 	logger.ModulePrintln(ma, LOG_LEVEL_FATAL, "62. logger.ModulePrint(): FATAL log output in DEBUG level")
 
 	logger.Close()
-	fmt.Println("+++++++++++++++++ TestLog ++++++++++++++++++++")
+	fmt.Println(`\\\\\\\\\\\\\\\\\\\\ TestLog ////////////////////`)
+	fmt.Println("\n")
+}
+func TestNoCounter(t *testing.T) {
+	fmt.Println(`//////////////////// TestNoCounter \\\\\\\\\\\\\\\\\\\\`)
+	logger := NewLogger(".", "test", nil, 2, 10, true)
+	logger.SetMainLevel(LOG_LEVEL_DEBUG)
+	logger.Debug("No counter test1\n")
+	logger = NewLogger(".", "test", []string{}, 2, 10, true)
+	logger.SetMainLevel(LOG_LEVEL_DEBUG)
+	logger.Debug("No counter test2\n")
+	fmt.Println(`\\\\\\\\\\\\\\\\\\\\ TestNoCounter ////////////////////`)
+	fmt.Println("\n")
 }

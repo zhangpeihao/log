@@ -55,12 +55,15 @@ func NewLogger(filePath, fileName string, counters []string, counterDumpTime, fi
 		log.Printf("create log file: %s%c%s failed\n", filePath, os.PathSeparator, fileName)
 		return nil
 	}
-	countFile, err := os.OpenFile(fmt.Sprintf("%s%c%s_counter.%d.%d-%02d-%02d_%02d-%02d-%02d.log",
-		filePath, os.PathSeparator, fileName, fileBeginTime,
-		now.Year(), now.Month(), now.Day(), now.Hour(), now.Minute(), now.Second()),
-		os.O_CREATE|os.O_RDWR, 0666)
-	if err != nil {
-		return nil
+	var countFile *os.File
+	if counters != nil && len(counters) > 0 {
+		countFile, err = os.OpenFile(fmt.Sprintf("%s%c%s_counter.%d.%d-%02d-%02d_%02d-%02d-%02d.log",
+			filePath, os.PathSeparator, fileName, fileBeginTime,
+			now.Year(), now.Month(), now.Day(), now.Hour(), now.Minute(), now.Second()),
+			os.O_CREATE|os.O_RDWR, 0666)
+		if err != nil {
+			return nil
+		}
 	}
 	counterDumpTicker := time.NewTicker(time.Duration(counterDumpTime) * time.Second)
 	logger := Logger{
@@ -82,15 +85,16 @@ func NewLogger(filePath, fileName string, counters []string, counterDumpTime, fi
 		moduleLevels:        make(map[string]LoggerModule),
 		debug2stdout:        debug2stdout,
 	}
-
-	countFile.WriteString(logger.counterHeaderString)
-	countFile.Sync()
-	for index, counter := range counters {
-		var i int64 = 0
-		logger.counter[counter] = &i
-		logger.counterValue[index] = ""
+	if countFile != nil {
+		countFile.WriteString(logger.counterHeaderString)
+		countFile.Sync()
+		for index, counter := range counters {
+			var i int64 = 0
+			logger.counter[counter] = &i
+			logger.counterValue[index] = ""
+		}
+		go logger.counterDump()
 	}
-	go logger.counterDump()
 	return &logger
 }
 
