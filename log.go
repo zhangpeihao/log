@@ -1,10 +1,12 @@
 package log
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
 	"log"
 	"os"
+	"runtime/pprof"
 	"strconv"
 	"strings"
 	"sync"
@@ -95,6 +97,7 @@ func NewLogger(filePath, fileName string, counters []string, counterDumpTime, fi
 		}
 		go logger.counterDump()
 	}
+	logger.DumpProf()
 	return &logger
 }
 
@@ -242,14 +245,36 @@ func (logger *Logger) ModulePrint(module LoggerModule, level int, v ...interface
 
 func (logger *Logger) ModulePrintf(module LoggerModule, level int, format string, v ...interface{}) {
 	if logger.ModuleLevelCheck(module, level) {
-		logger.logger.Printf(format, v...)
+		if logger.debug2stdout && level == LOG_LEVEL_DEBUG {
+			fmt.Printf(format, v...)
+		} else {
+			logger.logger.Printf(format, v...)
+		}
 	}
 }
 
 func (logger *Logger) ModulePrintln(module LoggerModule, level int, v ...interface{}) {
 	if logger.ModuleLevelCheck(module, level) {
-		logger.logger.Println(v...)
+		if logger.debug2stdout && level == LOG_LEVEL_DEBUG {
+			fmt.Println(v...)
+		} else {
+			logger.logger.Println(v...)
+		}
 	}
+}
+func (logger *Logger) DumpProf() {
+	p := pprof.Profiles()
+	buf := new(bytes.Buffer)
+	buf.WriteString("######## Profiles #######")
+	for _, profile := range p {
+		if err := profile.WriteTo(buf, 1); err != nil {
+			break
+		}
+	}
+	buf.WriteString("######## Heap #######")
+	pprof.WriteHeapProfile(buf)
+	buf.WriteString("######## End #######")
+	logger.logger.Print(string(buf.Bytes()))
 }
 
 func (logger *Logger) counterDump() {
@@ -269,6 +294,7 @@ func (logger *Logger) counterDump() {
 					logger.file.Close()
 					logger.file = file
 					logger.logger = log.New(logger.file, "", log.LstdFlags)
+					logger.DumpProf()
 				}
 				countFile, err := os.OpenFile(fmt.Sprintf("%s%c%s_counter.%d.%s_%s.log",
 					logger.filePath, os.PathSeparator, logger.fileName, fileBeginTime,
