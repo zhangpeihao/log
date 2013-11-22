@@ -265,15 +265,15 @@ func (logger *Logger) ModulePrintln(module LoggerModule, level int, v ...interfa
 func (logger *Logger) DumpProf() {
 	p := pprof.Profiles()
 	buf := new(bytes.Buffer)
-	buf.WriteString("######## Profiles #######")
+	buf.WriteString("######## Profiles #######\n")
 	for _, profile := range p {
 		if err := profile.WriteTo(buf, 1); err != nil {
 			break
 		}
 	}
-	buf.WriteString("######## Heap #######")
+	buf.WriteString("######## Heap #######\n")
 	pprof.WriteHeapProfile(buf)
-	buf.WriteString("######## End #######")
+	buf.WriteString("######## End #######\n")
 	logger.logger.Print(string(buf.Bytes()))
 }
 
