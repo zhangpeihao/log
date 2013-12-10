@@ -155,9 +155,9 @@ func TestLog(t *testing.T) {
 
 	// Set level to DEBUG
 	logger.SetModuleLevel(ma, LOG_LEVEL_DEBUG)
-	logger.ModulePrint(ma, LOG_LEVEL_DEBUG, "51. logger.ModulePrint(): no DEBUG log output in DEBUG level\n")
-	logger.ModulePrintf(ma, LOG_LEVEL_DEBUG, "52. logger.ModulePrint(): no DEBUG log output in DEBUG level\n")
-	logger.ModulePrintln(ma, LOG_LEVEL_DEBUG, "53. logger.ModulePrint(): no DEBUG log output in DEBUG level")
+	logger.ModulePrint(ma, LOG_LEVEL_DEBUG, "51. logger.ModulePrint(): DEBUG log output in DEBUG level\n")
+	logger.ModulePrintf(ma, LOG_LEVEL_DEBUG, "52. logger.ModulePrint(): DEBUG log output in DEBUG level\n")
+	logger.ModulePrintln(ma, LOG_LEVEL_DEBUG, "53. logger.ModulePrint(): DEBUG log output in DEBUG level")
 
 	logger.ModulePrint(ma, LOG_LEVEL_TRACE, "54. logger.ModulePrint(): TRACE log output in DEBUG level\n")
 	logger.ModulePrintf(ma, LOG_LEVEL_TRACE, "55. logger.ModulePrint(): TRACE log output in DEBUG level\n")
