@@ -35,7 +35,7 @@ type Logger struct {
 	moduleLevels  map[string]LoggerModule
 	mainLevel     int
 	mu            sync.Mutex
-	debug2stdout  bool
+	dump2stdout   bool
 	// For counter
 	counterDumpTime     int
 	counter             map[string]*int64
@@ -46,7 +46,11 @@ type Logger struct {
 	counterHeaderString string
 }
 
-func NewLogger(filePath, fileName string, counters []string, counterDumpTime, fileSplitTime int, debug2stdout bool) *Logger {
+func NewLogger(filePath, fileName string, counters []string, counterDumpTime, fileSplitTime int, dump2stdout bool) *Logger {
+	err := os.MkdirAll(filePath, os.ModeDir)
+	if err != nil {
+		return nil
+	}
 	now := time.Now()
 	fileBeginTime := int(now.Unix() / int64(fileSplitTime))
 	file, err := os.OpenFile(fmt.Sprintf("%s%c%s.%d.%d-%02d-%02d_%02d-%02d-%02d.log",
@@ -85,7 +89,7 @@ func NewLogger(filePath, fileName string, counters []string, counterDumpTime, fi
 		counterHeaderString: "time," + strings.Join(counters, ",") + "\r\n",
 		mainLevel:           LOG_LEVEL_FATAL,
 		moduleLevels:        make(map[string]LoggerModule),
-		debug2stdout:        debug2stdout,
+		dump2stdout:         dump2stdout,
 	}
 	if countFile != nil {
 		countFile.WriteString(logger.counterHeaderString)
@@ -115,88 +119,121 @@ func (logger *Logger) Close() {
 }
 
 func (logger *Logger) ForcePrint(v ...interface{}) {
+	if logger.dump2stdout {
+		fmt.Print(v...)
+	}
 	logger.logger.Print(v...)
 }
 func (logger *Logger) ForcePrintf(format string, v ...interface{}) {
+	if logger.dump2stdout {
+		fmt.Print(v...)
+	}
 	logger.logger.Printf(format, v...)
 }
 func (logger *Logger) ForcePrintln(v ...interface{}) {
+	if logger.dump2stdout {
+		fmt.Println(v...)
+	}
 	logger.logger.Println(v...)
 }
 
 func (logger *Logger) Print(v ...interface{}) {
 	if logger.mainLevel >= LOG_LEVEL_TRACE {
+		if logger.dump2stdout {
+			fmt.Print(v...)
+		}
 		logger.logger.Print(v...)
 	}
 }
 func (logger *Logger) Printf(format string, v ...interface{}) {
 	if logger.mainLevel >= LOG_LEVEL_TRACE {
+		if logger.dump2stdout {
+			fmt.Print(v...)
+		}
 		logger.logger.Printf(format, v...)
 	}
 }
 func (logger *Logger) Println(v ...interface{}) {
 	if logger.mainLevel >= LOG_LEVEL_TRACE {
+		if logger.dump2stdout {
+			fmt.Println(v...)
+		}
 		logger.logger.Println(v...)
 	}
 }
 
 func (logger *Logger) Fatal(v ...interface{}) {
 	if logger.mainLevel >= LOG_LEVEL_FATAL {
+		if logger.dump2stdout {
+			fmt.Print(v...)
+		}
 		logger.logger.Print(v...)
 	}
 }
 func (logger *Logger) Fatalf(format string, v ...interface{}) {
 	if logger.mainLevel >= LOG_LEVEL_FATAL {
+		if logger.dump2stdout {
+			fmt.Print(v...)
+		}
 		logger.logger.Printf(format, v...)
 	}
 }
 func (logger *Logger) Fatalln(v ...interface{}) {
 	if logger.mainLevel >= LOG_LEVEL_FATAL {
+		if logger.dump2stdout {
+			fmt.Println(v...)
+		}
 		logger.logger.Println(v...)
 	}
 }
 
 func (logger *Logger) Warning(v ...interface{}) {
 	if logger.mainLevel >= LOG_LEVEL_WARNING {
+		if logger.dump2stdout {
+			fmt.Print(v...)
+		}
 		logger.logger.Print(v...)
 	}
 }
 func (logger *Logger) Warningf(format string, v ...interface{}) {
 	if logger.mainLevel >= LOG_LEVEL_WARNING {
+		if logger.dump2stdout {
+			fmt.Print(v...)
+		}
 		logger.logger.Printf(format, v...)
 	}
 }
 func (logger *Logger) Warningln(v ...interface{}) {
 	if logger.mainLevel >= LOG_LEVEL_WARNING {
+		if logger.dump2stdout {
+			fmt.Println(v...)
+		}
 		logger.logger.Println(v...)
 	}
 }
 
 func (logger *Logger) Debug(v ...interface{}) {
 	if logger.mainLevel >= LOG_LEVEL_DEBUG {
-		if logger.debug2stdout {
+		if logger.dump2stdout {
 			fmt.Print(v...)
-		} else {
-			logger.logger.Print(v...)
 		}
+		logger.logger.Print(v...)
 	}
 }
 func (logger *Logger) Debugf(format string, v ...interface{}) {
 	if logger.mainLevel >= LOG_LEVEL_DEBUG {
-		if logger.debug2stdout {
+		if logger.dump2stdout {
 			fmt.Printf(format, v...)
-		} else {
-			logger.logger.Printf(format, v...)
 		}
+		logger.logger.Printf(format, v...)
 	}
 }
 func (logger *Logger) Debugln(v ...interface{}) {
 	if logger.mainLevel >= LOG_LEVEL_DEBUG {
-		if logger.debug2stdout {
+		if logger.dump2stdout {
 			fmt.Println(v...)
-		} else {
-			logger.logger.Println(v...)
 		}
+		logger.logger.Println(v...)
 	}
 }
 
@@ -239,27 +276,30 @@ func (logger *Logger) SetModuleLevelByName(moduleName string, level int) error {
 
 func (logger *Logger) ModulePrint(module LoggerModule, level int, v ...interface{}) {
 	if logger.ModuleLevelCheck(module, level) {
+		if logger.dump2stdout {
+			fmt.Print(v...)
+		}
 		logger.logger.Print(v...)
 	}
 }
 
 func (logger *Logger) ModulePrintf(module LoggerModule, level int, format string, v ...interface{}) {
 	if logger.ModuleLevelCheck(module, level) {
-		if logger.debug2stdout && level == LOG_LEVEL_DEBUG {
+		if logger.dump2stdout {
 			fmt.Printf(format, v...)
-		} else {
-			logger.logger.Printf(format, v...)
 		}
+		logger.logger.Printf(format, v...)
+
 	}
 }
 
 func (logger *Logger) ModulePrintln(module LoggerModule, level int, v ...interface{}) {
 	if logger.ModuleLevelCheck(module, level) {
-		if logger.debug2stdout && level == LOG_LEVEL_DEBUG {
+		if logger.dump2stdout {
 			fmt.Println(v...)
-		} else {
-			logger.logger.Println(v...)
 		}
+		logger.logger.Println(v...)
+
 	}
 }
 func (logger *Logger) DumpProf() {
