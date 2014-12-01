@@ -8,7 +8,7 @@ import (
 func TestLog(t *testing.T) {
 	fmt.Println(`//////////////////// TestLog \\\\\\\\\\\\\\\\\\\\`)
 	counters := []string{"a", "b"}
-	logger := NewLogger(".", "test", counters, 2, 10, true)
+	logger := NewLogger("./logs", "test", counters, 2, 10, true)
 	// Default log level is Fatal
 	logger.Debug("!!!!! logger.Debug(): no DEBUG log output in default level\n")
 	logger.Debugf("!!!!! logger.Debugf(): no DEBUG log output in default level\n")
@@ -177,12 +177,22 @@ func TestLog(t *testing.T) {
 }
 func TestNoCounter(t *testing.T) {
 	fmt.Println(`//////////////////// TestNoCounter \\\\\\\\\\\\\\\\\\\\`)
-	logger := NewLogger(".", "test", nil, 2, 10, true)
+	logger := NewLogger("./logs", "test", nil, 2, 10, true)
 	logger.SetMainLevel(LOG_LEVEL_DEBUG)
 	logger.Debug("No counter test1\n")
 	logger = NewLogger(".", "test", []string{}, 2, 10, true)
 	logger.SetMainLevel(LOG_LEVEL_DEBUG)
 	logger.Debug("No counter test2\n")
 	fmt.Println(`\\\\\\\\\\\\\\\\\\\\ TestNoCounter ////////////////////`)
+	fmt.Println("\n")
+}
+func TestStdLog(t *testing.T) {
+	fmt.Println(`//////////////////// TestStdLog \\\\\\\\\\\\\\\\\\\\`)
+	logger := NewStderrLogger()
+	logger.SetMainLevel(LOG_LEVEL_DEBUG)
+	logger.Printf("From TestStdLog\n")
+	logger.Add("a", int64(1))
+	logger.Close()
+	fmt.Println(`\\\\\\\\\\\\\\\\\\\\ TestStdLog ////////////////////`)
 	fmt.Println("\n")
 }
