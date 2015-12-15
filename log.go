@@ -134,18 +134,20 @@ func (logger *Logger) DumpHeader() {
 	}
 }
 func (logger *Logger) DumpProf() {
-	p := pprof.Profiles()
-	buf := new(bytes.Buffer)
-	buf.WriteString("######## Profiles #######\n")
-	for _, profile := range p {
-		if err := profile.WriteTo(buf, 1); err != nil {
-			break
+	if logger.mainLevel > LOG_LEVEL_OFF {
+		p := pprof.Profiles()
+		buf := new(bytes.Buffer)
+		buf.WriteString("######## Profiles #######\n")
+		for _, profile := range p {
+			if err := profile.WriteTo(buf, 1); err != nil {
+				break
+			}
 		}
+		buf.WriteString("######## Heap #######\n")
+		pprof.WriteHeapProfile(buf)
+		buf.WriteString("######## End #######\n")
+		logger.logger.Print(string(buf.Bytes()))
 	}
-	buf.WriteString("######## Heap #######\n")
-	pprof.WriteHeapProfile(buf)
-	buf.WriteString("######## End #######\n")
-	logger.logger.Print(string(buf.Bytes()))
 }
 
 func (logger *Logger) MainLevel() int {

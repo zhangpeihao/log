@@ -1,12 +1,13 @@
-package log
+package log_test
 
 import (
 	"fmt"
+	. "nschat2"
 	"testing"
 )
 
 func TestLog(t *testing.T) {
-	fmt.Println(`//////////////////// TestLog \\\\\\\\\\\\\\\\\\\\`)
+	fmt.Println("================= TestLog ====================")
 	counters := []string{"a", "b"}
 	logger := NewLogger("./logs", "test", counters, 2, 10, true)
 	// Default log level is Fatal
@@ -155,9 +156,9 @@ func TestLog(t *testing.T) {
 
 	// Set level to DEBUG
 	logger.SetModuleLevel(ma, LOG_LEVEL_DEBUG)
-	logger.ModulePrint(ma, LOG_LEVEL_DEBUG, "51. logger.ModulePrint(): DEBUG log output in DEBUG level\n")
-	logger.ModulePrintf(ma, LOG_LEVEL_DEBUG, "52. logger.ModulePrint(): DEBUG log output in DEBUG level\n")
-	logger.ModulePrintln(ma, LOG_LEVEL_DEBUG, "53. logger.ModulePrint(): DEBUG log output in DEBUG level")
+	logger.ModulePrint(ma, LOG_LEVEL_DEBUG, "51. logger.ModulePrint(): no DEBUG log output in DEBUG level\n")
+	logger.ModulePrintf(ma, LOG_LEVEL_DEBUG, "52. logger.ModulePrint(): no DEBUG log output in DEBUG level\n")
+	logger.ModulePrintln(ma, LOG_LEVEL_DEBUG, "53. logger.ModulePrint(): no DEBUG log output in DEBUG level")
 
 	logger.ModulePrint(ma, LOG_LEVEL_TRACE, "54. logger.ModulePrint(): TRACE log output in DEBUG level\n")
 	logger.ModulePrintf(ma, LOG_LEVEL_TRACE, "55. logger.ModulePrint(): TRACE log output in DEBUG level\n")
@@ -172,27 +173,13 @@ func TestLog(t *testing.T) {
 	logger.ModulePrintln(ma, LOG_LEVEL_FATAL, "62. logger.ModulePrint(): FATAL log output in DEBUG level")
 
 	logger.Close()
-	fmt.Println(`\\\\\\\\\\\\\\\\\\\\ TestLog ////////////////////`)
-	fmt.Println("\n")
+	fmt.Println("+++++++++++++++++ TestLog ++++++++++++++++++++")
 }
-func TestNoCounter(t *testing.T) {
-	fmt.Println(`//////////////////// TestNoCounter \\\\\\\\\\\\\\\\\\\\`)
-	logger := NewLogger("./logs", "test", nil, 2, 10, true)
-	logger.SetMainLevel(LOG_LEVEL_DEBUG)
-	logger.Debug("No counter test1\n")
-	logger = NewLogger(".", "test", []string{}, 2, 10, true)
-	logger.SetMainLevel(LOG_LEVEL_DEBUG)
-	logger.Debug("No counter test2\n")
-	fmt.Println(`\\\\\\\\\\\\\\\\\\\\ TestNoCounter ////////////////////`)
-	fmt.Println("\n")
-}
+
 func TestStdLog(t *testing.T) {
-	fmt.Println(`//////////////////// TestStdLog \\\\\\\\\\\\\\\\\\\\`)
+	fmt.Println("================= TestStdLog ====================")
 	logger := NewStderrLogger()
-	logger.SetMainLevel(LOG_LEVEL_DEBUG)
 	logger.Printf("From TestStdLog\n")
-	logger.Add("a", int64(1))
 	logger.Close()
-	fmt.Println(`\\\\\\\\\\\\\\\\\\\\ TestStdLog ////////////////////`)
-	fmt.Println("\n")
+	fmt.Println("+++++++++++++++++ TestStdLog ++++++++++++++++++++")
 }
