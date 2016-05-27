@@ -57,6 +57,10 @@ func NewLogger(filePath, fileName string, counters []string, counterDumpTime, fi
 func NewLoggerWithHeader(filePath, fileName string, counters []string,
 	counterDumpTime, fileSplitTime int, dump2stdout bool, header string) *Logger {
 	var logger *Logger
+	if fileSplitTime < 3600 {
+		// Use the minimum file split time.
+		fileSplitTime = 3600
+	}
 	if len(filePath) > 0 {
 		err := os.MkdirAll(filePath, os.ModePerm)
 		if err != nil {
