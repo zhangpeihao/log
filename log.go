@@ -48,7 +48,7 @@ type Logger struct {
 }
 
 func NewStderrLogger() *Logger {
-	return NewLoggerWithHeader("", "", nil, 0, 0, false, "")
+	return NewLoggerWithHeader("", "", nil, 0, 0, true, "")
 }
 
 func NewLogger(filePath, fileName string, counters []string, counterDumpTime, fileSplitTime int, dump2stdout bool) *Logger {
